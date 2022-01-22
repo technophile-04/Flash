@@ -1,6 +1,8 @@
 import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { contractABI, contractAddress } from '../utils/constants';
+import { shortenAddress } from '../utils/shortenAddress';
 
 export const TransactionContext = React.createContext();
 
@@ -21,6 +23,7 @@ const getEthereumContract = () => {
 export const TransactionProvider = ({ children }) => {
 	const [currentAccount, setCurrentAccount] = useState('');
 	const [transactions, setTransactions] = useState([]);
+	const [isCorrectNetwork, setIsCorrectNetwork] = useState(false);
 	const [formData, setFormData] = useState({
 		addressTo: '',
 		amount: '',
@@ -67,6 +70,7 @@ export const TransactionProvider = ({ children }) => {
 		try {
 			if (!ethereum) alert('You dont have ethereum wallet installed');
 			const accounts = await ethereum.request({ method: 'eth_accounts' });
+			console.log(accounts);
 			if (accounts.length > 0) {
 				setCurrentAccount(accounts[0]);
 			} else {
@@ -88,6 +92,7 @@ export const TransactionProvider = ({ children }) => {
 			});
 			console.log(accounts);
 			setCurrentAccount(accounts[0]);
+			getAllTransaction();
 		} catch (error) {
 			console.log(error);
 			throw new Error(error.message);
@@ -134,11 +139,12 @@ export const TransactionProvider = ({ children }) => {
 			console.log(`Loading-${txn.hash}`);
 			await txn.wait();
 			setLoading(false);
+			toast.success(`Sent ${parsedAmount} to ${shortenAddress(addressTo)}`);
 			console.log(`Sucess-${txn.hash}`);
 
 			const transactionCount = await transactionContract.getTransactionCount();
 			setTransactionCount(transactionCount.toNumber());
-			window.reload();
+			window.location.reload();
 		} catch (error) {
 			console.log(error);
 			throw new Error(error.message);
@@ -146,10 +152,29 @@ export const TransactionProvider = ({ children }) => {
 	};
 
 	useEffect(() => {
-		checkIfWalletIsConnected();
-		checkIfTransactionsExist();
-		getAllTransaction();
-	}, []);
+		if (ethereum) {
+			const getChain = async () => {
+				const provider = new ethers.providers.Web3Provider(ethereum);
+				const { chainId } = await provider.getNetwork(provider);
+				console.log('CHAIN ID : ', chainId);
+				setIsCorrectNetwork(chainId === 3);
+			};
+
+			ethereum.on('accountsChanged', (accounts) => {
+				setCurrentAccount(accounts[0]);
+			});
+			ethereum.on('networkChanged', function (networkId) {
+				window.location.reload();
+			});
+			checkIfWalletIsConnected();
+			checkIfTransactionsExist();
+			getChain();
+			console.log(isCorrectNetwork, 'HELLO THIS IS CONSOLE loG');
+			if (isCorrectNetwork) {
+				getAllTransaction();
+			}
+		}
+	}, [isCorrectNetwork]);
 
 	return (
 		<TransactionContext.Provider
@@ -162,6 +187,7 @@ export const TransactionProvider = ({ children }) => {
 				sendTransaction,
 				transactions,
 				loading,
+				isCorrectNetwork,
 			}}
 		>
 			{children}

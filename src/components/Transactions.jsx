@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
+import { AiFillPlayCircle } from 'react-icons/ai';
 
 import { TransactionContext } from '../context/TransactionContext';
 import useFetch from '../hooks/useFetch';
 
-import dummyData from '../utils/dummyData';
 import { shortenAddress } from '../utils/shortenAddress';
 
 const TransactionsCard = ({
@@ -25,7 +25,7 @@ const TransactionsCard = ({
       sm:min-w-[270px]
       sm:max-w-[300px]
       min-w-full
-      flex-col p-3 rounded-md hover:shadow-2xl"
+      flex-col p-3 rounded-md hover:shadow-2xl transition-all ease-in-out hover:-translate-y-1 hover:scale-110 duration-300"
 		>
 			<div className="flex flex-col items-center w-full mt-3">
 				<div className="display-flex justify-start w-full mb-6 p-2">
@@ -69,26 +69,50 @@ const TransactionsCard = ({
 };
 
 const Transactions = () => {
-	const { transactions, currentAccount } = useContext(TransactionContext);
+	const { transactions, currentAccount, connectWallet, isCorrectNetwork } =
+		useContext(TransactionContext);
 
 	return (
-		<div className="flex w-full justify-center items-center 2xl:px-20 gradient-bg-transactions">
-			<div className="flex flex-col md:p-12 py-12 px-4">
+		<div
+			className="flex w-full justify-center items-center 2xl:px-20 gradient-bg-transactions"
+			id="transactions"
+		>
+			<div className="flex flex-col md:px-12 md:pt-[7.2rem]  py-12 px-4">
 				{currentAccount ? (
 					<h3 className="text-white text-3xl text-center my-2">
 						Latest Transactions
 					</h3>
 				) : (
-					<h3 className="text-white text-3xl text-center my-2">
-						Connect your account to see the latest transactions
-					</h3>
+					<div className="flex flex-col items-center">
+						<h3 className="text-white text-3xl text-center my-2">
+							Connect your account to see the latest transactions
+						</h3>
+						<button
+							type="button"
+							className="flex flex-row justify-center items-center  bg-[#2952e3] p-2 px-3 rounded-full cursor-pointer hover:bg-[#2546bd] mx-2 my-5  animate-pulse pr-4"
+							onClick={connectWallet}
+						>
+							<AiFillPlayCircle className="text-white mr-2" />
+							<p className="text-white text-base font-semibold">
+								Connect Wallet
+							</p>
+						</button>
+					</div>
 				)}
 
-				<div className="flex flex-wrap justify-center items-center mt-10">
-					{[...dummyData, ...transactions].reverse().map((transaction, i) => (
-						<TransactionsCard key={transaction.id} {...transaction} />
-					))}
-				</div>
+				{isCorrectNetwork ? (
+					<div className="flex flex-wrap justify-center items-center mt-10">
+						{transactions.reverse().map((transaction, i) => (
+							<TransactionsCard key={transaction.id} {...transaction} />
+						))}
+					</div>
+				) : (
+					<div className="flex justify-center items-center mt-2">
+						<p className="text-2xl text-white">
+							Please select ropsten network to view latest transactions
+						</p>
+					</div>
+				)}
 			</div>
 		</div>
 	);

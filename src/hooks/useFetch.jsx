@@ -15,10 +15,8 @@ const useFetch = ({ keyword }) => {
 					);
 
 					const { data } = await response.json();
-					console.log(data, API_KEY);
 					setGifUrl(data[0]?.images?.downsized_medium?.url);
 				} catch (error) {
-					console.log('Fif', error.message);
 					setGifUrl(
 						'https://acegif.com/wp-content/uploads/gif-shaking-head-38.gif'
 					);
