@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { HiMenuAlt4 } from 'react-icons/hi';
-import { AiOutlineClose } from 'react-icons/ai';
-
-const NavBarItem = ({ title, classprops }) => (
-	<li className={`mx-4 cursor-pointer ${classprops} font-semibold`}>{title}</li>
-);
+import { AiFillPlayCircle, AiOutlineClose } from 'react-icons/ai';
+import { TransactionContext } from '../context/TransactionContext';
 
 const Navbar = () => {
+	const { currentAccount, connectWallet } = useContext(TransactionContext);
 	const [toggleMenu, setToggleMenu] = useState(false);
 
 	return (
@@ -18,12 +16,23 @@ const Navbar = () => {
 				</div>
 			</div>
 			<ul className="text-white md:flex hidden list-none justify-between items-center flex-initial">
-				{['Market', 'Exchange', 'Tutorials', 'Wallets'].map((item, index) => (
-					<NavBarItem key={item + index} title={item} />
-				))}
-				<li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
-					Login
+				<li className="mx-4 cursor-pointer font-semibold">
+					<a href="#transactions">Transactions</a>
 				</li>
+				{!currentAccount && (
+					<li>
+						<button
+							type="button"
+							className="flex flex-row justify-center items-center  bg-[rgb(41,82,227)] p-2 px-3 rounded-full cursor-pointer hover:bg-[#2546bd] mx-2  pr-4"
+							onClick={connectWallet}
+						>
+							<AiFillPlayCircle className="text-white mr-2" />
+							<p className="text-white text-base font-semibold">
+								Connect Wallet
+							</p>
+						</button>
+					</li>
+				)}
 			</ul>
 			<div className="flex relative">
 				{toggleMenu ? (
@@ -47,15 +56,9 @@ const Navbar = () => {
 						<li className="text-xl w-full my-2">
 							<AiOutlineClose onClick={() => setToggleMenu(false)} />
 						</li>
-						{['Market', 'Exchange', 'Tutorials', 'Wallets'].map(
-							(item, index) => (
-								<NavBarItem
-									key={item + index}
-									title={item}
-									classprops="my-2 text-lg"
-								/>
-							)
-						)}
+						<li className="mx-4 cursor-pointer font-semibold my-2 text-lg">
+							<a href="#transactions">Transactions</a>
+						</li>
 					</ul>
 				)}
 			</div>
