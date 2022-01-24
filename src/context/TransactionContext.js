@@ -139,7 +139,7 @@ export const TransactionProvider = ({ children }) => {
 			console.log(`Loading-${txn.hash}`);
 			await txn.wait();
 			setLoading(false);
-			toast.success(`Sent ${parsedAmount} to ${shortenAddress(addressTo)}`);
+			toast.success(`Sent ${amount}ETH to ${shortenAddress(addressTo)}`);
 			console.log(`Sucess-${txn.hash}`);
 
 			const transactionCount = await transactionContract.getTransactionCount();
@@ -169,7 +169,6 @@ export const TransactionProvider = ({ children }) => {
 			checkIfWalletIsConnected();
 			checkIfTransactionsExist();
 			getChain();
-			console.log(isCorrectNetwork, 'HELLO THIS IS CONSOLE loG');
 			if (isCorrectNetwork) {
 				getAllTransaction();
 			}
@@ -188,6 +187,7 @@ export const TransactionProvider = ({ children }) => {
 				transactions,
 				loading,
 				isCorrectNetwork,
+				transactionCount,
 			}}
 		>
 			{children}
