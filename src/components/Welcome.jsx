@@ -31,6 +31,7 @@ const Welcome = () => {
 		const { addressTo, amount, message, keyword } = formData;
 
 		if (!addressTo || !amount || !message || !keyword) {
+			toast.error('Please fill all the fields!');
 			return;
 		}
 		if (isCorrectNetwork) {
